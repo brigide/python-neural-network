@@ -1,12 +1,14 @@
 from neuralNetwork.neuralNetwork import NeuralNetwork
 
 def main():
-    nn = NeuralNetwork(2, 2, 1)
+    nn = NeuralNetwork(2, 2, 2)
 
     inputs = [1, 0]
+    targets = [1, 0]
 
-    output = nn.feedFoward(inputs)
-    print(output)
+    #output = nn.feedFoward(inputs)
+    nn.train(inputs, targets)
+    #print(output)
 
 
 

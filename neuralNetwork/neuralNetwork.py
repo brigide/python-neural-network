@@ -50,3 +50,21 @@ class NeuralNetwork:
         output.map(Activation.sigmoid)
 
         return output.toArray()
+
+
+    def train(self, inputs, targets):
+        outputs = self.feedFoward(inputs) # get the guess based on the inputs
+
+        #convert array to Matrix object
+        outputs = Matrix.fromArray(outputs) 
+        targets = Matrix.fromArray(targets)
+
+
+        # calculation of the error
+        # error = targets - outputs
+        error = Matrix.subtract(targets, outputs)
+
+        outputs.toTable()
+        targets.toTable()
+        error.toTable()
+

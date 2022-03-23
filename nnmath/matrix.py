@@ -55,6 +55,17 @@ class Matrix:
                 for j in range(self.cols):
                     self.data[i][j] += n
 
+
+    @staticmethod
+    def subtract(a, b):
+        # return a new matrix a - b
+        result = Matrix(a.rows, a.cols)
+        for i in range(a.rows):
+            for j in range(a.cols):
+                result.data[i][j] = a.data[i][j] - b.data[i][j]
+
+        return result
+
     @staticmethod
     def multiply(a, b):
         # matrix product
