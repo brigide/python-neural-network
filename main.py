@@ -1,7 +1,7 @@
 from neuralNetwork.neuralNetwork import NeuralNetwork
 
 def main():
-    nn = NeuralNetwork(2, 2, 2)
+    nn = NeuralNetwork(2, 2, 2, 0.1)
 
     inputs = [1, 0]
     targets = [1, 0]

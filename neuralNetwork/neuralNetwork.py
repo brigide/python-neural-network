@@ -1,11 +1,13 @@
+from numpy import gradient
 from nnmath.matrix import Matrix
 from nnmath.activation import Activation
 
 class NeuralNetwork:
-    def __init__(self, inputs, hidden, outputs):
+    def __init__(self, inputs, hidden, outputs, learningRate):
         self.input_nodes = inputs
         self.hidden_nodes = hidden
         self.output_nodes = outputs
+        self.learningRate = learningRate
 
         # weights between inputs (i) and hidden (h)
         rows = self.hidden_nodes # one matrix row for each hidden node
@@ -53,18 +55,69 @@ class NeuralNetwork:
 
 
     def train(self, inputs, targets):
-        outputs = self.feedFoward(inputs) # get the guess based on the inputs
+        #converts simple array into Matrix object
+        inputs = Matrix.fromArray(inputs)
+        #make a guess
+
+        # uses matricial multiplication in order to get the sum of weights and inputs for each hidden layer
+        hidden = Matrix.multiply(self.weights_ih, inputs)
+
+        hidden.add(self.bias_h) # add bias values element-wise for each hidden node value
+
+        # hidden activation function
+        hidden.map(Activation.sigmoid)
+
+        # repeating process for output
+        outputs = Matrix.multiply(self.weights_ho, hidden)
+        outputs.add(self.bias_o)
+
+        outputs.map(Activation.sigmoid)
+
+
+
+        #train
 
         #convert array to Matrix object
-        outputs = Matrix.fromArray(outputs) 
         targets = Matrix.fromArray(targets)
 
 
         # calculation of the error
         # error = targets - outputs
-        error = Matrix.subtract(targets, outputs)
+        output_errors = Matrix.subtract(targets, outputs)
+
+        #calculating deltas = learning rate * errors matrix * derivative sigmoid of each output * transposed sigmoided inputs
+        #get the sigmoid derivative for each output
+        #calculating the gradient
+        gradients = Matrix.newMap(outputs, Activation.derivativeSigmoid) # transform all sigmoided outputs in it's derivative 
+        gradients.multiplyHamard(output_errors) # multiply the result by the output error
+        gradients.multiplyScalar(self.learningRate) # multiply the result by the learning rate
+
+        #calculating the deltas
+        hidden_t = Matrix.transpose(hidden) # transpose sigmoided inputs
+        weights_ho_deltas = Matrix.multiply(gradients, hidden_t) # multiplying the result gradients by the trasnposed hidden layer
+        #apply the found deltas adjustment in the current weights
+        self.weights_ho.add(weights_ho_deltas)
+
+
+        # repeat the process for the input->hidden weights (ih)
+        weights_ho_t = Matrix.transpose(self.weights_ho) # transpose the weight's matrix from hidden to output
+        hidden_errors = Matrix.multiply(weights_ho_t, output_errors) # multiply transposet weights by the previously calculated errors
+
+        #calculating gradients
+        hidden_gradients = Matrix.newMap(hidden, Activation.derivativeSigmoid)
+        hidden_gradients.multiplyHamard(hidden_errors)
+        hidden_gradients.multiplyScalar(self.learningRate)
+
+        #calculating deltas
+        inputs_t = Matrix.transpose(inputs)
+        weights_ih_deltas = Matrix.multiply(hidden_gradients, inputs_t)
+
+        self.weights_ih.add(weights_ih_deltas)
 
         outputs.toTable()
         targets.toTable()
-        error.toTable()
+        output_errors.toTable()
+        # hidden_errors.toTable()
+        self.weights_ho.toTable()
+        # self.weights_ih.toTable()
 

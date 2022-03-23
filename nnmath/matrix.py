@@ -38,11 +38,12 @@ class Matrix:
             for j in range(self.cols):
                 self.data[i][j] = uniform(-1, 1)
 
-    def transpose(self):
-        result = Matrix(self.cols, self.rows)
-        for i in range(self.rows):
-            for j in range(self.cols):
-                result.data[j][i] = self.data[i][j]
+    @staticmethod
+    def transpose(matrix):
+        result = Matrix(matrix.cols, matrix.rows)
+        for i in range(matrix.rows):
+            for j in range(matrix.cols):
+                result.data[j][i] = matrix.data[i][j]
         return result
 
     def add(self, n):
@@ -84,6 +85,13 @@ class Matrix:
         
         return result
 
+
+    def multiplyHamard(self, matrix):
+        # hamard product
+        for i in range(self.rows):
+            for j in range(self.cols):
+                self.data[i][j] *= matrix.data[i][j]
+
     def multiplyScalar(self, n):
         # scalar product
         for i in range(self.rows):
@@ -96,3 +104,12 @@ class Matrix:
             for j in range(self.cols):
                 value = self.data[i][j]
                 self.data[i][j] = fn(value)
+
+    @staticmethod
+    def newMap(matrix, fn):
+        result = Matrix(matrix.rows, matrix.cols)
+        for i in range(matrix.rows):
+            for j in range(matrix.cols):
+                value = matrix.data[i][j]
+                result.data[i][j] = fn(value)
+        return result
